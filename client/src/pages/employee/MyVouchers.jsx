@@ -1,0 +1,54 @@
+import { Link } from "react-router-dom";
+import api, { getErrorMsg } from "../../api/axios";
+import VoucherFilters from "../../components/VoucherFilters";
+import VoucherTable from "../../components/VoucherTable";
+import { useVoucherList } from "../../hooks/useVoucherList";
+
+function MyVouchers() {
+  const { vouchers, error, loading, sort, toggleSort, setFilters, reload } = useVoucherList();
+
+  async function handleDelete(v) {
+    if (!window.confirm(`Delete draft ${v.voucher_no}?`)) return;
+    try {
+      await api.delete(`/vouchers/${v.id}`);
+      reload();
+    } catch (err) {
+      alert(getErrorMsg(err));
+    }
+  }
+
+  return (
+    <div className="page">
+      <div className="page-head">
+        <h2>My Vouchers</h2>
+        <Link to="/employee/create" className="btn-link">+ New Voucher</Link>
+      </div>
+
+      <VoucherFilters onSearch={setFilters} searchLabel="Voucher no / title" />
+
+      {error && <div className="alert">{error}</div>}
+      <p className="small">{loading ? "Loading..." : `${vouchers.length} voucher(s) found`}</p>
+
+      <VoucherTable
+        vouchers={vouchers}
+        sort={sort}
+        onSort={toggleSort}
+        showEmployee={false}
+        actions={(v) =>
+          v.status === "draft" && (
+            <>
+              {" | "}
+              <Link to={`/employee/vouchers/${v.id}/edit`}>Edit</Link>
+              {" | "}
+              <a href="#" className="danger" onClick={(e) => { e.preventDefault(); handleDelete(v); }}>
+                Delete
+              </a>
+            </>
+          )
+        }
+      />
+    </div>
+  );
+}
+
+export default MyVouchers;
