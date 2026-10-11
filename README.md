@@ -9,7 +9,8 @@ Digital expense vouchers. **Employees** submit, the **Director** approves (with 
 
 🌐 **Live demo: https://evms-ten.vercel.app**. The free server sleeps when idle, so the first login can take up to a minute.
 
-[demo-walkthrough.webm](https://github.com/user-attachments/assets/6904494d-3783-4488-b900-c86564709def)
+[demo-walkthrough.webm](https://github.com/user-attachments/assets/69601f3b-6448-4b63-b461-a6b9f3578588)
+
 
 📸 [Screenshots](docs/screenshots)
 
