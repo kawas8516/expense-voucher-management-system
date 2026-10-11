@@ -1,13 +1,7 @@
 import multer from "multer";
-import path from "path";
 
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, "sign_" + Date.now() + "_" + Math.round(Math.random() * 1000) + ext);
-  },
-});
+// keep file in memory, it is saved to the files table (see utils/files.js)
+const storage = multer.memoryStorage();
 
 // only allow images for signature
 function fileFilter(req, file, cb) {

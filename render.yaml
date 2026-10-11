@@ -1,0 +1,23 @@
+# Render Blueprint for the backend API
+# Render dashboard -> New -> Blueprint -> pick this repo
+services:
+  - type: web
+    name: evms-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false # paste Supabase session pooler connection string
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: CLIENT_URL
+        value: http://localhost:5173

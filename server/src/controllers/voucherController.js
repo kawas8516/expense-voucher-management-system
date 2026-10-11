@@ -1,7 +1,7 @@
-import fs from "fs";
 import { validationResult } from "express-validator";
 import pool from "../config/db.js";
 import { generateVoucherNo } from "../utils/voucherNumber.js";
+import { saveFile } from "../utils/files.js";
 
 // voucher + employee name + director name
 const SELECT_VOUCHER = `
@@ -14,17 +14,9 @@ const SELECT_VOUCHER = `
   LEFT JOIN users d ON d.id = v.director_id
 `;
 
-// if request fails after multer saved a file, delete that file
-function removeUploaded(req) {
-  if (req.file) {
-    fs.unlink(req.file.path, () => {});
-  }
-}
-
 function sendValidationErrors(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    removeUploaded(req);
     res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
     return true;
   }
@@ -131,7 +123,7 @@ export async function createVoucher(req, res) {
   // new signature uploaded -> use it and save to profile, else reuse saved one
   let signature = null;
   if (req.file) {
-    signature = "/uploads/" + req.file.filename;
+    signature = await saveFile(req.file);
     await pool.query("UPDATE users SET signature_path = $1 WHERE id = $2", [signature, req.user.id]);
   } else {
     const u = await pool.query("SELECT signature_path FROM users WHERE id = $1", [req.user.id]);
@@ -157,16 +149,13 @@ export async function updateVoucher(req, res) {
   if (sendValidationErrors(req, res)) return;
 
   const voucher = await getOwnDraft(req, res);
-  if (!voucher) {
-    removeUploaded(req);
-    return;
-  }
+  if (!voucher) return;
 
   const { expense_date, department, title, category, description, amount } = req.body;
 
   let signature = voucher.employee_signature;
   if (req.file) {
-    signature = "/uploads/" + req.file.filename;
+    signature = await saveFile(req.file);
     await pool.query("UPDATE users SET signature_path = $1 WHERE id = $2", [signature, req.user.id]);
   }
 
@@ -197,7 +186,7 @@ export async function approveVoucher(req, res) {
   // signature: new upload, else the one saved in director profile
   let signature = null;
   if (req.file) {
-    signature = "/uploads/" + req.file.filename;
+    signature = await saveFile(req.file);
   } else {
     const u = await pool.query("SELECT signature_path FROM users WHERE id = $1", [req.user.id]);
     signature = u.rows[0] ? u.rows[0].signature_path : null;
@@ -217,7 +206,10 @@ export async function approveVoucher(req, res) {
   );
 
   if (result.rows.length === 0) {
-    removeUploaded(req);
+    // not approved, so remove the signature we just saved
+    if (req.file) {
+      await pool.query("DELETE FROM files WHERE id = $1", [signature.split("/").pop()]);
+    }
     const exists = await findVoucher(req.params.id);
     if (!exists || exists.status === "draft") {
       return res.status(404).json({ message: "Voucher not found" });
