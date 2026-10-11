@@ -506,3 +506,9 @@ input[aria-invalid="true"] {
 td:first-child {
   white-space: nowrap;
 }
+
+/* hide Edge's built-in password reveal / clear icons, we have our own eye button */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}

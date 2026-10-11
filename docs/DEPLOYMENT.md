@@ -17,5 +17,5 @@ Vercel forwards `/api/*` to the Render API, so the browser only talks to one ori
 
 ## Notes
 
-- Render's free plan sleeps after 15 minutes idle, so the first request can take about a minute.
+- Render's free plan sleeps after 15 minutes idle, so the first request can take about a minute. The login page pings the API as soon as it opens, shows a "starting the server" note, and retries the login until the server is up.
 - Signatures are stored in the database (`files` table), because Render's disk is wiped on every deploy.

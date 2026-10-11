@@ -6,6 +6,10 @@
 //
 // needs both dev servers running:  server -> npm run dev,  client -> npm run dev
 // run:  cd demo && npm install && npm run demo
+//
+// it RESETS the database. if server/.env points at a hosted db, run a separate local api instead:
+//   set DATABASE_URL=<local db url>, PORT=5055, start `node src/server.js` in server/,
+//   then run this with API_URL=http://localhost:5055/api (browser api calls are sent there too)
 
 import { chromium } from "playwright";
 import { execSync } from "child_process";
@@ -19,7 +23,7 @@ const SHOTS = path.join(ROOT, "docs", "screenshots");
 const VIDEO_DIR = path.join(ROOT, "docs", "video-tmp");
 const SIGN_DIR = path.join(ROOT, "demo", "signatures");
 const APP = "http://localhost:5173";
-const API = "http://localhost:5000/api";
+const API = process.env.API_URL || "http://localhost:5000/api";
 const PASSWORD = "password123";
 
 fs.mkdirSync(SHOTS, { recursive: true });
@@ -72,12 +76,23 @@ const SIGN = {
 console.log("Seeding vouchers...");
 await seedVouchers(API);
 
+// when API_URL is given, send the browser's /api calls to that server instead of the vite proxy
+async function routeApi(ctx) {
+  if (!process.env.API_URL) return;
+  const apiOrigin = new URL(API).origin;
+  await ctx.route(
+    (u) => new URL(u).pathname.startsWith("/api/"),
+    (r) => r.continue({ url: r.request().url().replace(APP, apiOrigin) })
+  );
+}
+
 // ---------- 4. walkthrough video + screenshots ----------
 console.log("Recording walkthrough...");
 const context = await browser.newContext({
   viewport: { width: 1280, height: 720 },
   recordVideo: { dir: VIDEO_DIR, size: { width: 1280, height: 720 } },
 });
+await routeApi(context);
 const page = await context.newPage();
 page.on("dialog", (d) => d.accept()); // confirm() popups
 
@@ -133,7 +148,7 @@ async function scrollDown(times = 4) {
 
 // --- login page ---
 await page.goto(APP + "/login");
-await caption("Expense Voucher Management System - login page");
+await caption("Login page - demo accounts can be filled with one click");
 await pause(1500);
 await shot("01-login", false);
 await page.getByRole("button", { name: "Login" }).click();
@@ -142,7 +157,15 @@ await pause(1200);
 await shot("02-login-validation", false);
 
 // --- employee ---
-await login("employee@test.com", "Employee (Rahul) logs in");
+await page.goto(APP + "/login");
+await caption("Employee (Rahul) logs in - the eye icon shows the password for 10 seconds");
+await page.locator("input[type=email]").pressSequentially("employee@test.com", { delay: 35 });
+await page.locator("#login-password").pressSequentially(PASSWORD, { delay: 35 });
+await page.click(".eye-btn");
+await pause(1500);
+await page.getByRole("button", { name: "Login" }).click();
+await page.waitForSelector("text=Welcome");
+await pause();
 await caption("Employee dashboard - only his own vouchers are counted");
 await pause(2000);
 await shot("03-employee-dashboard");
@@ -188,11 +211,11 @@ await shot("08-director-dashboard");
 
 await page.locator(".navbar").getByRole("link", { exact: true, name: "Pending Approvals" }).click();
 await page.waitForSelector("text=voucher(s) waiting");
-await caption("Pending approvals - oldest request first");
+await caption("Pending approvals - oldest first, each row has View / Approve / Reject");
 await pause(1800);
 await shot("09-pending-approvals");
 
-await page.locator("tr", { hasText: "Cab to airport" }).getByRole("link", { name: "Approve / Reject" }).click();
+await page.locator("tr", { hasText: "Cab to airport" }).getByRole("link", { name: "View" }).click();
 await page.waitForSelector(".action-box");
 await caption("Director reviews the details (cannot change them)");
 await pause();
@@ -211,7 +234,7 @@ await pause();
 
 await page.locator(".navbar").getByRole("link", { exact: true, name: "Pending Approvals" }).click();
 await page.waitForSelector("text=voucher(s) waiting");
-await page.locator("tr", { hasText: "Broadband" }).getByRole("link", { name: "Approve / Reject" }).click();
+await page.locator("tr", { hasText: "Broadband" }).getByRole("link", { name: "View" }).click();
 await page.waitForSelector(".action-box");
 await scrollDown(6);
 await caption("Rejecting needs a reason");
@@ -291,6 +314,7 @@ fs.rmSync(VIDEO_DIR, { recursive: true, force: true });
 // ---------- mobile screenshots ----------
 console.log("Mobile screenshots...");
 const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true });
+await routeApi(mobile);
 const m = await mobile.newPage();
 const empToken = await token("employee@test.com");
 const me = await api("GET", "/auth/me", empToken);
@@ -314,4 +338,17 @@ await m.screenshot({ path: path.join(SHOTS, "mobile-03-create-voucher.png"), ful
 await mobile.close();
 
 await browser.close();
+
+// ---------- shrink the video (GitHub upload limit is 10 MB) ----------
+// uses the ffmpeg that comes with playwright, skipped if it is not there
+const ffDir = path.join(process.env.LOCALAPPDATA || "", "ms-playwright");
+const ffFolder = fs.existsSync(ffDir) && fs.readdirSync(ffDir).find((d) => d.startsWith("ffmpeg"));
+if (ffFolder) {
+  const ff = path.join(ffDir, ffFolder, "ffmpeg-win64.exe");
+  const raw = path.join(ROOT, "docs", "demo-walkthrough.webm");
+  const small = path.join(ROOT, "docs", "demo-small.webm");
+  execSync(`"${ff}" -hide_banner -loglevel error -y -i "${raw}" -c:v libvpx-vp9 -b:v 0 -crf 40 -row-mt 1 -deadline good -cpu-used 4 -an "${small}"`);
+  fs.renameSync(small, raw);
+  console.log("Video compressed:", Math.round(fs.statSync(raw).size / 1024), "KB");
+}
 console.log("\nDone. Screenshots in docs/screenshots, video at docs/demo-walkthrough.webm");
