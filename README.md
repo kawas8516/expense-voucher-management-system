@@ -7,9 +7,26 @@
 
 Digital expense vouchers. **Employees** submit, the **Director** approves (with signature) or rejects (with reason), and **Accounts** tracks approved vouchers for reimbursement.
 
+🌐 **Live demo: https://evms-ten.vercel.app**. The free server sleeps when idle, so the first login can take up to a minute.
+
 🎬 [Demo video](docs/demo-walkthrough.webm) · 📸 [Screenshots](docs/screenshots)
 
-![Approved voucher](docs/screenshots/11-voucher-approved.png)
+| Director dashboard | Approved voucher (both signatures) |
+|---|---|
+| ![Director dashboard](docs/screenshots/08-director-dashboard.png) | ![Approved voucher](docs/screenshots/11-voucher-approved.png) |
+
+## 🔑 Demo Logins
+
+The same accounts work on the live demo and on a local setup (`npm run db:setup`).
+
+| Role | Name | Email | Password |
+|---|---|---|---|
+| Employee | Rahul Sharma (IT) | `employee@test.com` | `password123` |
+| Employee | Priya Mehta (Sales) | `employee2@test.com` | `password123` |
+| Director | Anil Verma | `director@test.com` | `password123` |
+| Accounts | Sneha Joshi | `accounts@test.com` | `password123` |
+
+Suggested walkthrough: log in as an **Employee** to create and submit a voucher, then as the **Director** to approve or reject it, then as **Accounts** to see the result.
 
 ## Features
 
@@ -31,8 +48,6 @@ npm run dev               # :5000
 cd client && npm install
 npm run dev               # :5173
 ```
-
-Demo logins (password `password123`): `employee@test.com`, `employee2@test.com`, `director@test.com`, `accounts@test.com`
 
 ## Database Schema
 
