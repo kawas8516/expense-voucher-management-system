@@ -69,14 +69,14 @@ function VoucherDetails() {
   return (
     <div className="page">
       <p className="no-print">
-        <Link to={backLink[0]}>&laquo; Back to {backLink[1]}</Link>
+        <Link to={backLink[0]} className="btn btn-sm btn-secondary">&larr; Back to {backLink[1]}</Link>
       </p>
       <div className="page-head">
         <h2>Expense Voucher - {v.voucher_no}</h2>
         <span>
           <StatusBadge status={v.status} />{" "}
           {v.status !== "draft" && (
-            <button className="btn-grey no-print" onClick={() => window.print()}>Print</button>
+            <button className="btn-secondary no-print" onClick={() => window.print()}>Print</button>
           )}
         </span>
       </div>
@@ -154,9 +154,9 @@ function VoucherDetails() {
 
       {isOwnDraft && (
         <div className="form-buttons no-print">
-          <Link to={`/employee/vouchers/${v.id}/edit`} className="btn-link">Edit</Link>
+          <Link to={`/employee/vouchers/${v.id}/edit`} className="btn">Edit</Link>
           <button onClick={handleSubmit} disabled={busy}>Submit for Approval</button>
-          <button className="btn-red" onClick={handleDelete}>Delete</button>
+          <button className="btn-danger" onClick={handleDelete}>Delete</button>
         </div>
       )}
     </div>

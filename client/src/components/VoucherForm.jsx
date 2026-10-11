@@ -109,7 +109,7 @@ function VoucherForm({ initial, savedSignature, onSave, saving }) {
       )}
 
       <div className="form-buttons">
-        <button type="button" className="btn-grey" disabled={saving} onClick={() => handleSave(false)}>
+        <button type="button" className="btn-secondary" disabled={saving} onClick={() => handleSave(false)}>
           Save as Draft
         </button>
         <button type="button" disabled={saving} onClick={() => handleSave(true)}>

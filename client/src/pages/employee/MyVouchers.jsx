@@ -21,7 +21,7 @@ function MyVouchers() {
     <div className="page">
       <div className="page-head">
         <h2>My Vouchers</h2>
-        <Link to="/employee/create" className="btn-link">+ New Voucher</Link>
+        <Link to="/employee/create" className="btn">+ New Voucher</Link>
       </div>
 
       <VoucherFilters onSearch={setFilters} searchLabel="Voucher no / title" />
@@ -37,12 +37,10 @@ function MyVouchers() {
         actions={(v) =>
           v.status === "draft" && (
             <>
-              {" | "}
-              <Link to={`/employee/vouchers/${v.id}/edit`}>Edit</Link>
-              {" | "}
-              <a href="#" className="danger" onClick={(e) => { e.preventDefault(); handleDelete(v); }}>
+              <Link to={`/employee/vouchers/${v.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
+              <button type="button" className="btn-sm btn-danger" onClick={() => handleDelete(v)}>
                 Delete
-              </a>
+              </button>
             </>
           )
         }

@@ -75,16 +75,55 @@ textarea {
   border: 1px solid #999;
 }
 
-button {
+/* ---- buttons ----
+   one style everywhere: primary (default), .btn-secondary, .btn-danger
+   .btn makes a <Link> look like a button, .btn-sm is the small size (tables) */
+button,
+.btn {
+  display: inline-block;
   padding: 6px 14px;
-  border: 1px solid #2c3e50;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid #2471a3;
+  border-radius: 3px;
   background: #2471a3;
-  color: white;
+  color: #fff;
   cursor: pointer;
 }
 
-button:hover {
+button:hover,
+.btn:hover {
   background: #1a5276;
+  border-color: #1a5276;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #2471a3;
+}
+
+.btn-secondary:hover {
+  background: #eaf2f8;
+}
+
+.btn-danger {
+  background: #fff;
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+.btn-danger:hover {
+  background: #fdecea;
+  border-color: #c0392b;
+}
+
+.btn-sm {
+  padding: 3px 8px;
+  font-size: 13px;
 }
 
 .login-box {
@@ -111,7 +150,7 @@ table {
 th,
 td {
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 7px 6px;
   text-align: left;
 }
 
@@ -163,6 +202,8 @@ th {
 
 button:disabled {
   background: #999;
+  border-color: #999;
+  color: #fff;
   cursor: not-allowed;
 }
 
@@ -198,19 +239,6 @@ h3 {
   flex-wrap: wrap;
 }
 
-.btn-grey { background: #5f6b6d; }
-.btn-grey:hover { background: #4d5759; }
-.btn-red { background: #c0392b; }
-.btn-red:hover { background: #a93226; }
-
-.btn-link {
-  display: inline-block;
-  padding: 6px 14px;
-  background: #1e8449;
-  color: #fff;
-  text-decoration: none;
-  border: 1px solid #186a3b;
-}
 
 label.inline {
   display: inline-block;
@@ -225,12 +253,15 @@ label.inline select {
   overflow-x: auto;
 }
 
-.actions a {
-  color: #2471a3;
+/* buttons stay in one row when there is space, wrap on narrow screens */
+td.actions > * {
+  margin: 2px 4px 2px 0;
 }
 
-a.danger {
-  color: #c0392b;
+@media (min-width: 1100px) {
+  td.actions {
+    white-space: nowrap;
+  }
 }
 
 .success {
@@ -346,8 +377,6 @@ ul.activity {
   margin-top: 20px;
 }
 
-.btn-green { background: #1e8449; }
-.btn-green:hover { background: #186a3b; }
 
 @media (max-width: 800px) {
   .filter-grid {

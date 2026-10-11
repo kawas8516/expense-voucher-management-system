@@ -192,7 +192,7 @@ function Login() {
         <p className="small">Click to fill the form:</p>
         <div className="demo-buttons">
           {DEMO_USERS.map((d) => (
-            <button key={d.email} type="button" className="btn-grey" onClick={() => fillDemo(d.email)}>
+            <button key={d.email} type="button" className="btn-secondary" onClick={() => fillDemo(d.email)}>
               {d.role}
             </button>
           ))}

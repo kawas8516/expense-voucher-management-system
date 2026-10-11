@@ -85,7 +85,7 @@ function DirectorAction({ voucherId, onDone }) {
             </div>
           )}
           <div className="form-buttons">
-            <button className="btn-green" onClick={approve} disabled={busy}>Approve</button>
+            <button onClick={approve} disabled={busy}>Approve</button>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ function DirectorAction({ voucherId, onDone }) {
           <label>Reason for rejection *</label>
           <textarea rows="3" maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)}></textarea>
           <div className="form-buttons">
-            <button className="btn-red" onClick={reject} disabled={busy}>Reject</button>
+            <button className="btn-danger" onClick={reject} disabled={busy}>Reject</button>
           </div>
         </div>
       </div>

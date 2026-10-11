@@ -16,7 +16,7 @@ function Header({ col, sort, onSort, children }) {
 
 // common table for voucher lists
 // sort + onSort are optional, without them headers are not clickable
-// actions(v) can add extra links in last column (eg. edit/delete)
+// actions(v) can add extra buttons in last column (eg. edit/delete)
 function VoucherTable({ vouchers, sort, onSort, showEmployee = true, actions }) {
   if (vouchers.length === 0) {
     return <p>No vouchers found.</p>;
@@ -50,7 +50,7 @@ function VoucherTable({ vouchers, sort, onSort, showEmployee = true, actions }) 
               <td className="num">{formatAmount(v.amount)}</td>
               <td><StatusBadge status={v.status} /></td>
               <td className="actions">
-                <Link to={`/vouchers/${v.id}`}>View</Link>
+                <Link to={`/vouchers/${v.id}`} className="btn btn-sm btn-secondary">View</Link>
                 {actions && actions(v)}
               </td>
             </tr>

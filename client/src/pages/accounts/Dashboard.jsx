@@ -28,7 +28,7 @@ function AccountsDashboard() {
 
       <h3>Recently Approved (ready for reimbursement)</h3>
       <VoucherTable vouchers={data.recent} />
-      <p><Link to="/accounts/vouchers">See all vouchers &raquo;</Link></p>
+      <p><Link to="/accounts/vouchers" className="btn btn-sm btn-secondary">See all vouchers &rarr;</Link></p>
     </div>
   );
 }

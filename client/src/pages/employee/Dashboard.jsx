@@ -18,7 +18,7 @@ function EmployeeDashboard() {
     <div className="page">
       <div className="page-head">
         <h2>Welcome, {user.name}</h2>
-        <Link to="/employee/create" className="btn-link">+ New Voucher</Link>
+        <Link to="/employee/create" className="btn">+ New Voucher</Link>
       </div>
 
       <div className="stat-grid">
@@ -32,7 +32,7 @@ function EmployeeDashboard() {
 
       <h3>Recent Vouchers</h3>
       <VoucherTable vouchers={data.recent} showEmployee={false} />
-      <p><Link to="/employee/vouchers">See all my vouchers &raquo;</Link></p>
+      <p><Link to="/employee/vouchers" className="btn btn-sm btn-secondary">See all my vouchers &rarr;</Link></p>
     </div>
   );
 }

@@ -90,7 +90,7 @@ function VoucherFilters({ onSearch, hideStatus, hideDraft, searchLabel }) {
       {error && <div className="error">{error}</div>}
       <div className="form-buttons">
         <button type="submit">Search</button>
-        <button type="button" className="btn-grey" onClick={reset}>Reset</button>
+        <button type="button" className="btn-secondary" onClick={reset}>Reset</button>
       </div>
     </form>
   );

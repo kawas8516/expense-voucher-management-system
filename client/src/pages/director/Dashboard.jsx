@@ -27,7 +27,7 @@ function DirectorDashboard() {
 
       {s.pending > 0 && (
         <p>
-          <Link to="/director/pending" className="btn-link">Review {s.pending} pending voucher(s)</Link>
+          <Link to="/director/pending" className="btn">Review {s.pending} pending voucher(s)</Link>
         </p>
       )}
 
@@ -46,7 +46,7 @@ function DirectorDashboard() {
           ))}
         </ul>
       )}
-      <p><Link to="/director/vouchers">See all vouchers &raquo;</Link></p>
+      <p><Link to="/director/vouchers" className="btn btn-sm btn-secondary">See all vouchers &rarr;</Link></p>
     </div>
   );
 }
