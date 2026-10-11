@@ -27,7 +27,7 @@ function EmployeeDashboard() {
         <StatCard label="Pending Approval" value={s.pending} color="orange" />
         <StatCard label="Approved" value={s.approved} color="green" />
         <StatCard label="Rejected" value={s.rejected} color="red" />
-        <StatCard label="Total Amount Claimed" value={formatAmount(s.total_claimed)} color="#8e44ad" />
+        <StatCard label="Total Amount Claimed" value={formatAmount(s.total_claimed)} color="purple" />
       </div>
 
       <h3>Recent Vouchers</h3>

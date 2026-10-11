@@ -23,7 +23,7 @@ function AccountsDashboard() {
         <StatCard label="Pending Approval" value={s.pending} color="orange" />
         <StatCard label="Approved" value={s.approved} color="green" />
         <StatCard label="Rejected" value={s.rejected} color="red" />
-        <StatCard label="Total Approved Amount" value={formatAmount(s.approved_amount)} color="#8e44ad" />
+        <StatCard label="Total Approved Amount" value={formatAmount(s.approved_amount)} color="purple" />
       </div>
 
       <h3>Recently Approved (ready for reimbursement)</h3>

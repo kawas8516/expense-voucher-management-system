@@ -22,7 +22,7 @@ function DirectorDashboard() {
         <StatCard label="Pending Approval" value={s.pending} color="orange" />
         <StatCard label="Approved Today" value={s.approved_today} color="green" />
         <StatCard label="Rejected Today" value={s.rejected_today} color="red" />
-        <StatCard label="Total Pending Amount" value={formatAmount(s.pending_amount)} color="#8e44ad" />
+        <StatCard label="Total Pending Amount" value={formatAmount(s.pending_amount)} color="purple" />
       </div>
 
       {s.pending > 0 && (

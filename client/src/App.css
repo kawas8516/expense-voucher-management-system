@@ -78,13 +78,13 @@ textarea {
 button {
   padding: 6px 14px;
   border: 1px solid #2c3e50;
-  background: #3498db;
+  background: #2471a3;
   color: white;
   cursor: pointer;
 }
 
 button:hover {
-  background: #2980b9;
+  background: #1a5276;
 }
 
 .login-box {
@@ -121,6 +121,8 @@ th {
 
 /* status badge */
 .badge {
+  display: inline-block;
+  white-space: nowrap;
   padding: 2px 8px;
   border-radius: 3px;
   font-size: 12px;
@@ -128,13 +130,13 @@ th {
   color: #fff;
 }
 
-.badge-draft { background: gray; }
-.badge-pending { background: orange; }
-.badge-approved { background: green; }
-.badge-rejected { background: red; }
+.badge-draft { background: #646e70; }
+.badge-pending { background: #a85400; }
+.badge-approved { background: #1e7b34; }
+.badge-rejected { background: #c0392b; }
 
 .error {
-  color: red;
+  color: #c0392b;
   font-size: 12px;
 }
 
@@ -196,18 +198,18 @@ h3 {
   flex-wrap: wrap;
 }
 
-.btn-grey { background: #7f8c8d; }
-.btn-grey:hover { background: #6c7a7b; }
+.btn-grey { background: #5f6b6d; }
+.btn-grey:hover { background: #4d5759; }
 .btn-red { background: #c0392b; }
 .btn-red:hover { background: #a93226; }
 
 .btn-link {
   display: inline-block;
   padding: 6px 14px;
-  background: #27ae60;
+  background: #1e8449;
   color: #fff;
   text-decoration: none;
-  border: 1px solid #1e8449;
+  border: 1px solid #186a3b;
 }
 
 label.inline {
@@ -317,7 +319,7 @@ td.num {
 .stat-card {
   background: #fafafa;
   border: 1px solid #ccc;
-  border-left: 5px solid #3498db;
+  border-top: 3px solid #2471a3;
   padding: 12px;
 }
 
@@ -344,8 +346,8 @@ ul.activity {
   margin-top: 20px;
 }
 
-.btn-green { background: #27ae60; }
-.btn-green:hover { background: #1e8449; }
+.btn-green { background: #1e8449; }
+.btn-green:hover { background: #186a3b; }
 
 @media (max-width: 800px) {
   .filter-grid {
@@ -380,4 +382,98 @@ ul.activity {
     color: #000;
     border: 1px solid #000;
   }
+}
+
+/* ---- login page ---- */
+.login-title {
+  font-size: 18px;
+  margin: 0 0 4px;
+  color: #2c3e50;
+}
+
+.login-box h2 {
+  margin: 10px 0;
+}
+
+.info {
+  background: #fff8e1;
+  border: 1px solid #f0c36d;
+  color: #6d4c00;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.demo-box {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px dashed #bbb;
+}
+
+.demo-box .small {
+  margin: 6px 0 0;
+}
+
+.login-box .demo-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.login-box .demo-buttons button {
+  margin-top: 8px;
+  flex: 1;
+  width: auto;
+}
+
+code {
+  background: #eee;
+  padding: 1px 4px;
+}
+
+/* keyboard users can see where they are */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #f39c12;
+  outline-offset: 1px;
+}
+
+input[aria-invalid="true"] {
+  border-color: #c0392b;
+}
+
+/* show / hide password */
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  padding-right: 38px;
+}
+
+.login-box .eye-btn {
+  position: absolute;
+  right: 1px;
+  top: 5px; /* input has margin-top: 4px */
+  bottom: 1px;
+  width: 34px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box .eye-btn:hover {
+  background: #eee;
+  color: #222;
+}
+
+/* keep voucher numbers on one line in tables */
+td:first-child {
+  white-space: nowrap;
 }
