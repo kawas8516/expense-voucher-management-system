@@ -1,6 +1,7 @@
 {
   "name": "evms-demo",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "description": "Seeds demo data and records screenshots + walkthrough video with Playwright",
   "scripts": {

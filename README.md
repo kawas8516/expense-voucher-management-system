@@ -75,3 +75,7 @@ REST under `/api`: `auth/login`, `vouchers` (CRUD, `submit`, `approve`, `reject`
 6. Users come from the seed script (no sign-up page).
 
 Deployment (Supabase + Render + Vercel): [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+## License
+
+Proprietary, all rights reserved. The code is shared only so it can be reviewed and evaluated as an assignment submission; reuse needs written permission. See [LICENSE](LICENSE).
