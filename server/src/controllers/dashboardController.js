@@ -1,4 +1,6 @@
 import pool from "../config/db.js";
+import { mongoReady } from "../config/mongo.js";
+import AuditLog from "../models/AuditLog.js";
 
 const RECENT_SELECT = `
   SELECT v.id, v.voucher_no, v.title, v.department, v.category, v.amount, v.status,
@@ -44,6 +46,18 @@ export async function getStats(req, res) {
               COALESCE(SUM(amount) FILTER (WHERE status = 'pending'), 0) AS pending_amount
        FROM vouchers`
     );
+    // recent activity comes from the MongoDB audit log when it is available
+    // (only submitted / approved / rejected, draft activity is private to the employee)
+    if (mongoReady()) {
+      const events = await AuditLog.find(
+        { action: { $in: ["voucher_submitted", "voucher_approved", "voucher_rejected"] } },
+        { ip: 0 }
+      )
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean();
+      return res.json({ stats: toNumbers(stats.rows[0]), activity: true, recent: events });
+    }
     const recent = await pool.query(
       RECENT_SELECT + " WHERE v.status <> 'draft' ORDER BY v.updated_at DESC LIMIT 10"
     );

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import pool from "../config/db.js";
+import { logAudit } from "../utils/audit.js";
 
 // remove password before sending user to frontend
 function cleanUser(u) {
@@ -29,13 +30,13 @@ export async function login(req, res) {
   const user = result.rows[0];
 
   // same message for both cases so nobody can guess emails
-  if (!user) {
-    return res.status(401).json({ message: "Invalid email or password" });
-  }
-  const match = await bcrypt.compare(password, user.password_hash);
+  const match = user ? await bcrypt.compare(password, user.password_hash) : false;
   if (!match) {
+    // only the email is logged, never the password
+    logAudit(req, "login_failed", { user: user || undefined, details: { email: email.toLowerCase() } });
     return res.status(401).json({ message: "Invalid email or password" });
   }
+  logAudit(req, "login", { user });
 
   const token = jwt.sign(
     { id: user.id, role: user.role, name: user.name },

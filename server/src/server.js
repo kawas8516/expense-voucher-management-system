@@ -3,6 +3,7 @@ dotenv.config({ quiet: true });
 
 import app from "./app.js";
 import pool from "./config/db.js";
+import { connectMongo } from "./config/mongo.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -19,4 +20,5 @@ app.listen(PORT, async () => {
   } catch (err) {
     console.log("Could not connect to PostgreSQL:", err.message);
   }
+  await connectMongo();
 });

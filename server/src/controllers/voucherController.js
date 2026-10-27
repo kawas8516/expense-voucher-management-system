@@ -2,6 +2,9 @@ import { validationResult } from "express-validator";
 import pool from "../config/db.js";
 import { generateVoucherNo } from "../utils/voucherNumber.js";
 import { saveFile } from "../utils/files.js";
+import { logAudit } from "../utils/audit.js";
+import { mongoReady } from "../config/mongo.js";
+import AuditLog from "../models/AuditLog.js";
 
 // voucher + employee name + director name
 const SELECT_VOUCHER = `
@@ -26,6 +29,13 @@ function sendValidationErrors(req, res) {
 async function findVoucher(id) {
   const result = await pool.query(SELECT_VOUCHER + " WHERE v.id = $1", [id]);
   return result.rows[0];
+}
+
+// employee sees only own vouchers, director / accounts see everything except drafts
+function canSee(user, voucher) {
+  if (!voucher) return false;
+  if (user.role === "employee") return voucher.employee_id === user.id;
+  return voucher.status !== "draft";
 }
 
 // employee can only touch own draft vouchers
@@ -102,16 +112,23 @@ export async function getVouchers(req, res) {
 // GET /api/vouchers/:id
 export async function getVoucher(req, res) {
   const voucher = await findVoucher(req.params.id);
-
-  const notAllowed =
-    !voucher ||
-    (req.user.role === "employee" && voucher.employee_id !== req.user.id) ||
-    (req.user.role !== "employee" && voucher.status === "draft");
-
-  if (notAllowed) {
+  if (!canSee(req.user, voucher)) {
     return res.status(404).json({ message: "Voucher not found" });
   }
   res.json(voucher);
+}
+
+// GET /api/vouchers/:id/history  (audit events from MongoDB, oldest first)
+export async function getVoucherHistory(req, res) {
+  const voucher = await findVoucher(req.params.id);
+  if (!canSee(req.user, voucher)) {
+    return res.status(404).json({ message: "Voucher not found" });
+  }
+  if (!mongoReady()) {
+    return res.json({ enabled: false, events: [] });
+  }
+  const events = await AuditLog.find({ voucherId: voucher.id }, { ip: 0 }).sort({ createdAt: 1 }).lean();
+  res.json({ enabled: true, events });
 }
 
 // POST /api/vouchers  (always saved as draft first)
@@ -141,6 +158,7 @@ export async function createVoucher(req, res) {
   );
 
   const voucher = await findVoucher(result.rows[0].id);
+  logAudit(req, "voucher_created", { voucher, details: { amount: Number(voucher.amount) } });
   res.status(201).json(voucher);
 }
 
@@ -167,7 +185,15 @@ export async function updateVoucher(req, res) {
     [expense_date, department, title, category || null, description || null, amount, signature, voucher.id]
   );
 
-  res.json(await findVoucher(voucher.id));
+  const updated = await findVoucher(voucher.id);
+  // which fields actually changed, for the history
+  const changed = ["expense_date", "department", "title", "category", "description"].filter(
+    (f) => (voucher[f] || "") !== (updated[f] || "")
+  );
+  if (Number(voucher.amount) !== Number(updated.amount)) changed.push("amount");
+  if (req.file) changed.push("signature");
+  logAudit(req, "voucher_updated", { voucher: updated, details: { changed } });
+  res.json(updated);
 }
 
 // DELETE /api/vouchers/:id
@@ -176,6 +202,7 @@ export async function deleteVoucher(req, res) {
   if (!voucher) return;
 
   await pool.query("DELETE FROM vouchers WHERE id = $1", [voucher.id]);
+  logAudit(req, "voucher_deleted", { voucher, details: { amount: Number(voucher.amount) } });
   res.json({ message: "Voucher deleted" });
 }
 
@@ -220,7 +247,9 @@ export async function approveVoucher(req, res) {
   if (req.file) {
     await pool.query("UPDATE users SET signature_path = $1 WHERE id = $2", [signature, req.user.id]);
   }
-  res.json(await findVoucher(req.params.id));
+  const approved = await findVoucher(req.params.id);
+  logAudit(req, "voucher_approved", { voucher: approved, details: { amount: Number(approved.amount) } });
+  res.json(approved);
 }
 
 // POST /api/vouchers/:id/reject  (director)
@@ -243,7 +272,12 @@ export async function rejectVoucher(req, res) {
     }
     return res.status(400).json({ message: "Only pending vouchers can be rejected" });
   }
-  res.json(await findVoucher(req.params.id));
+  const rejected = await findVoucher(req.params.id);
+  logAudit(req, "voucher_rejected", {
+    voucher: rejected,
+    details: { reason: req.body.reason, amount: Number(rejected.amount) },
+  });
+  res.json(rejected);
 }
 
 // POST /api/vouchers/:id/submit
@@ -259,5 +293,7 @@ export async function submitVoucher(req, res) {
     "UPDATE vouchers SET status = 'pending', submitted_at = NOW(), updated_at = NOW() WHERE id = $1",
     [voucher.id]
   );
-  res.json(await findVoucher(voucher.id));
+  const submitted = await findVoucher(voucher.id);
+  logAudit(req, "voucher_submitted", { voucher: submitted, details: { amount: Number(submitted.amount) } });
+  res.json(submitted);
 }

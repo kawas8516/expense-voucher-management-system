@@ -3,6 +3,7 @@ import { body, param, query, validationResult } from "express-validator";
 import {
   getVouchers,
   getVoucher,
+  getVoucherHistory,
   createVoucher,
   updateVoucher,
   deleteVoucher,
@@ -74,6 +75,7 @@ router.use(verifyToken);
 
 router.get("/", listRules, getVouchers);
 router.get("/:id", idRule, checkId, getVoucher);
+router.get("/:id/history", idRule, checkId, getVoucherHistory);
 
 // employee only
 router.post("/", allowRoles("employee"), upload.single("signature"), voucherRules, createVoucher);

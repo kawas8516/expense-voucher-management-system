@@ -32,6 +32,7 @@ Errors come back as `{ "message": "..." }`:
 | POST | `/vouchers/:id/submit` | employee | - | draft → pending, needs employee signature |
 | POST | `/vouchers/:id/approve` | director | multipart: `signature` (optional if one is saved) | pending → approved |
 | POST | `/vouchers/:id/reject` | director | `{ reason }` | pending → rejected, reason 1-500 chars |
+| GET | `/vouchers/:id/history` | any | - | audit events from MongoDB, oldest first: `{ enabled, events }`. Same visibility as the voucher. `enabled: false` when MongoDB isn't connected |
 
 If no new signature file is sent, the user's last saved signature is used.
 
@@ -59,7 +60,7 @@ GET /api/vouchers?department=sales&status=approved&min=500&sort=amount&order=asc
 | Role | stats | recent |
 |---|---|---|
 | employee | `total, draft, pending, approved, rejected, total_claimed` | 5 latest own |
-| director | `pending, approved_today, rejected_today, pending_amount` | 10 latest activity |
+| director | `pending, approved_today, rejected_today, pending_amount` | 10 latest submitted / approved / rejected events from the MongoDB audit log (`activity: true`); falls back to the 10 latest vouchers without MongoDB |
 | accounts | `total, pending, approved, rejected, approved_amount` | 5 latest approved |
 
 ## Files and health
@@ -67,4 +68,4 @@ GET /api/vouchers?department=sales&status=approved&min=500&sort=amount&order=asc
 | Method | Endpoint | Notes |
 |---|---|---|
 | GET | `/files/:uuid` | signature image (png / jpg). Public, so `<img>` can load it; the random UUID is the protection |
-| GET | `/health` | `{ "ok": true }` |
+| GET | `/health` | `{ "ok": true, "mongo": "connected" \| "disabled" }` |

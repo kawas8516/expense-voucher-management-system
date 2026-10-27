@@ -4,6 +4,7 @@ import api, { getErrorMsg } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import StatusBadge from "../components/StatusBadge";
 import DirectorAction from "../components/DirectorAction";
+import VoucherHistory from "../components/VoucherHistory";
 import { formatAmount, formatDate, formatDateTime } from "../utils/helpers";
 
 function VoucherDetails() {
@@ -147,6 +148,8 @@ function VoucherDetails() {
           <tr><th>Last Updated</th><td>{formatDateTime(v.updated_at)}</td></tr>
         </tbody>
       </table>
+
+      <VoucherHistory voucherId={v.id} version={v.updated_at} />
 
       {user.role === "director" && v.status === "pending" && (
         <DirectorAction voucherId={v.id} onDone={afterAction} />

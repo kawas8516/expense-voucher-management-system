@@ -10,6 +10,9 @@
 // it RESETS the database. if server/.env points at a hosted db, run a separate local api instead:
 //   set DATABASE_URL=<local db url>, PORT=5055, start `node src/server.js` in server/,
 //   then run this with API_URL=http://localhost:5055/api (browser api calls are sent there too)
+//
+// SKIP_RESET=1: keep the data that is already there (eg. after `npm run db:seed-demo`),
+// no reset and no seeding, just record. Its approve / reject steps become part of the data.
 
 import { chromium } from "playwright";
 import { execSync } from "child_process";
@@ -25,13 +28,16 @@ const SIGN_DIR = path.join(ROOT, "demo", "signatures");
 const APP = "http://localhost:5173";
 const API = process.env.API_URL || "http://localhost:5000/api";
 const PASSWORD = "password123";
+const SKIP_RESET = process.env.SKIP_RESET === "1";
 
 fs.mkdirSync(SHOTS, { recursive: true });
 fs.mkdirSync(SIGN_DIR, { recursive: true });
 
 // ---------- 1. reset db ----------
-console.log("Resetting database...");
-execSync("npm run db:setup", { cwd: path.join(ROOT, "server"), stdio: "inherit" });
+if (!SKIP_RESET) {
+  console.log("Resetting database...");
+  execSync("npm run db:setup", { cwd: path.join(ROOT, "server"), stdio: "inherit" });
+}
 
 const browser = await chromium.launch({ channel: "msedge", headless: true });
 
@@ -73,8 +79,10 @@ const SIGN = {
 };
 
 // ---------- 3. seed vouchers via API ----------
-console.log("Seeding vouchers...");
-await seedVouchers(API);
+if (!SKIP_RESET) {
+  console.log("Seeding vouchers...");
+  await seedVouchers(API);
+}
 
 // when API_URL is given, send the browser's /api calls to that server instead of the vite proxy
 async function routeApi(ctx) {
@@ -215,7 +223,7 @@ await caption("Pending approvals - oldest first, each row has View / Approve / R
 await pause(1800);
 await shot("09-pending-approvals");
 
-await page.locator("tr", { hasText: "Cab to airport" }).getByRole("link", { name: "View" }).click();
+await page.locator("tr", { hasText: "Cab to airport - Pune client trip" }).getByRole("link", { name: "View" }).click();
 await page.waitForSelector(".action-box");
 await caption("Director reviews the details (cannot change them)");
 await pause();

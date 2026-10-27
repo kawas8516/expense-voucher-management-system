@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useDashboard } from "../../hooks/useDashboard";
 import StatCard from "../../components/StatCard";
 import StatusBadge from "../../components/StatusBadge";
-import { formatAmount, formatDateTime } from "../../utils/helpers";
+import { AUDIT_LABELS, AUDIT_STATUS, formatAmount, formatDateTime } from "../../utils/helpers";
 
 function DirectorDashboard() {
   const { user } = useAuth();
@@ -34,6 +34,19 @@ function DirectorDashboard() {
       <h3>Recent Voucher Activity</h3>
       {data.recent.length === 0 ? (
         <p>No activity yet.</p>
+      ) : data.activity ? (
+        // events from the MongoDB audit log: who did what and when
+        <ul className="activity">
+          {data.recent.map((e) => (
+            <li key={e._id}>
+              <span className="small">{formatDateTime(e.createdAt)}</span>{" - "}
+              <b>{e.user ? e.user.name : "Someone"}</b>{" "}
+              <span className={"badge badge-" + AUDIT_STATUS[e.action]}>{AUDIT_LABELS[e.action]}</span>{" "}
+              <Link to={`/vouchers/${e.voucherId}`}>{e.voucherNo}</Link>
+              {e.details && e.details.amount !== undefined && <> ({formatAmount(e.details.amount)})</>}
+            </li>
+          ))}
+        </ul>
       ) : (
         <ul className="activity">
           {data.recent.map((v) => (
