@@ -16,6 +16,7 @@ const auditLogSchema = new mongoose.Schema(
         "voucher_submitted",
         "voucher_approved",
         "voucher_rejected",
+        "signature_updated",
       ],
     },
     voucherId: Number,

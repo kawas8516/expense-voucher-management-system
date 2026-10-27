@@ -4,8 +4,9 @@ import { CATEGORIES, STATUS_LABELS } from "../utils/helpers";
 const EMPTY = { q: "", department: "", category: "", status: "", from: "", to: "", min: "", max: "" };
 
 // search + filter box. calls onSearch(filters) when Search is clicked
-function VoucherFilters({ onSearch, hideStatus, hideDraft, searchLabel }) {
-  const [f, setF] = useState(EMPTY);
+// initial = starting values, eg. { status: "approved" } when opened from a menu link
+function VoucherFilters({ onSearch, hideStatus, hideDraft, searchLabel, initial }) {
+  const [f, setF] = useState({ ...EMPTY, ...initial });
   const [error, setError] = useState("");
 
   function change(e) {

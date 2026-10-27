@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import pool from "../config/db.js";
 import { logAudit } from "../utils/audit.js";
+import { saveFile } from "../utils/files.js";
 
 // remove password before sending user to frontend
 function cleanUser(u) {
@@ -14,6 +15,7 @@ function cleanUser(u) {
     employee_code: u.employee_code,
     department: u.department,
     signature_path: u.signature_path,
+    created_at: u.created_at,
   };
 }
 
@@ -53,5 +55,17 @@ export async function me(req, res) {
   if (result.rows.length === 0) {
     return res.status(404).json({ message: "User not found" });
   }
+  res.json({ user: cleanUser(result.rows[0]) });
+}
+
+// PUT /api/auth/me/signature  (multipart "signature", png / jpg)
+// becomes the saved signature used for the next voucher / approval
+export async function updateSignature(req, res) {
+  if (!req.file) {
+    return res.status(400).json({ message: "Please choose a signature image" });
+  }
+  const path = await saveFile(req.file);
+  const result = await pool.query("UPDATE users SET signature_path = $1 WHERE id = $2 RETURNING *", [path, req.user.id]);
+  logAudit(req, "signature_updated");
   res.json({ user: cleanUser(result.rows[0]) });
 }

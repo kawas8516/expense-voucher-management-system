@@ -4,6 +4,7 @@ import authRoutes from "./routes/authRoutes.js";
 import voucherRoutes from "./routes/voucherRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import { mongoReady } from "./config/mongo.js";
 
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/vouchers", voucherRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/audit", auditRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

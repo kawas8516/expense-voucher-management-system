@@ -512,3 +512,127 @@ input::-ms-reveal,
 input::-ms-clear {
   display: none;
 }
+
+/* ---- navbar dropdown menus ---- */
+.navbar a.active {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.nav-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.navbar .nav-menu-button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 14px;
+  margin: 0;
+}
+
+.navbar .nav-menu-button:hover,
+.navbar .nav-menu-button[aria-expanded="true"] {
+  background: #3d566e;
+  border-color: #3d566e;
+}
+
+.navbar .nav-menu-button.active {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.nav-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 100; /* dropdown layer, above page content */
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid #bbb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
+  animation: menu-in 120ms ease-out;
+}
+
+.nav-menu-list.right {
+  left: auto;
+  right: 0;
+}
+
+@keyframes menu-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu-list { animation: none; }
+}
+
+.navbar .nav-menu-list a,
+.navbar .nav-menu-list button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: #222;
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbar .nav-menu-list a:hover,
+.navbar .nav-menu-list a:focus-visible,
+.navbar .nav-menu-list button:hover,
+.navbar .nav-menu-list button:focus-visible {
+  background: #eaf2f8;
+  color: #1a5276;
+  outline-offset: -2px;
+}
+
+.nav-menu-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: #ddd;
+}
+
+/* list page: count on the left, buttons on the right */
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.list-head .small {
+  margin: 0;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  /* menus open as a full-width block under the button instead of floating */
+  .nav-menu {
+    display: block;
+  }
+  .nav-menu-list,
+  .nav-menu-list.right {
+    position: static;
+    box-shadow: none;
+    margin-top: 4px;
+  }
+}

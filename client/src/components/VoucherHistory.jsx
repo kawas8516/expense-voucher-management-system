@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { AUDIT_LABELS, formatAmount, formatDateTime } from "../utils/helpers";
-
-// readable text for the "Details" column
-function detailsText(e) {
-  const d = e.details || {};
-  if (d.reason) return "Reason: " + d.reason;
-  if (d.changed) return d.changed.length ? "Changed: " + d.changed.join(", ").replace(/_/g, " ") : "No changes";
-  if (d.amount !== undefined) return formatAmount(d.amount);
-  return "-";
-}
+import { AUDIT_LABELS, auditDetails, formatDateTime } from "../utils/helpers";
 
 // voucher history from the MongoDB audit log
 // `version` changes after approve / submit, so the list reloads
@@ -49,7 +40,7 @@ function VoucherHistory({ voucherId, version }) {
                   <td>{formatDateTime(e.createdAt)}</td>
                   <td>{AUDIT_LABELS[e.action] || e.action}</td>
                   <td>{e.user ? `${e.user.name} (${e.user.role})` : "-"}</td>
-                  <td>{detailsText(e)}</td>
+                  <td>{auditDetails(e)}</td>
                 </tr>
               ))}
             </tbody>

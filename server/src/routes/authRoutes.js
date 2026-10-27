@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { login, me } from "../controllers/authController.js";
+import { login, me, updateSignature } from "../controllers/authController.js";
 import { verifyToken } from "../middleware/auth.js";
+import upload from "../middleware/upload.js";
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.post(
 );
 
 router.get("/me", verifyToken, me);
+router.put("/me/signature", verifyToken, upload.single("signature"), updateSignature);
 
 export default router;

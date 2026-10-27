@@ -19,6 +19,7 @@ Errors come back as `{ "message": "..." }`:
 |---|---|---|---|---|
 | POST | `/auth/login` | public | `{ email, password }` | `{ token, user }` |
 | GET | `/auth/me` | any | - | `{ user }` |
+| PUT | `/auth/me/signature` | any | multipart `signature` (png / jpg, max 2 MB) | saves it as the user's signature for the next voucher / approval → `{ user }` |
 
 ## Vouchers
 
@@ -62,6 +63,19 @@ GET /api/vouchers?department=sales&status=approved&min=500&sort=amount&order=asc
 | employee | `total, draft, pending, approved, rejected, total_claimed` | 5 latest own |
 | director | `pending, approved_today, rejected_today, pending_amount` | 10 latest submitted / approved / rejected events from the MongoDB audit log (`activity: true`); falls back to the 10 latest vouchers without MongoDB |
 | accounts | `total, pending, approved, rejected, approved_amount` | 5 latest approved |
+
+## Activity log (MongoDB)
+
+`GET /audit` (director, accounts) returns `{ enabled, events, total, page, pages }`, newest first, 25 per page.
+
+| Param | Example | Match |
+|---|---|---|
+| `action` | `voucher_approved` | exact (`login`, `login_failed`, `voucher_created`, `voucher_updated`, `voucher_submitted`, `voucher_approved`, `voucher_rejected`, `signature_updated`) |
+| `user` | `vikram` | user name, partial, case-insensitive |
+| `from`, `to` | `2026-10-01` | event date range (IST days) |
+| `page` | `2` | page number |
+
+Events of vouchers that are still drafts (and deleted drafts) are not listed, since drafts are private to the employee.
 
 ## Files and health
 

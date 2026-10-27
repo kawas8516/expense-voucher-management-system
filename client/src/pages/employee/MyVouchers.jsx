@@ -3,9 +3,11 @@ import api, { getErrorMsg } from "../../api/axios";
 import VoucherFilters from "../../components/VoucherFilters";
 import VoucherTable from "../../components/VoucherTable";
 import { useVoucherList } from "../../hooks/useVoucherList";
+import { useStatusParam } from "../../hooks/useStatusParam";
 
 function MyVouchers() {
-  const { vouchers, error, loading, sort, toggleSort, setFilters, reload } = useVoucherList();
+  const initial = useStatusParam();
+  const { vouchers, error, loading, sort, toggleSort, setFilters, reload } = useVoucherList({}, undefined, initial);
 
   async function handleDelete(v) {
     if (!window.confirm(`Delete draft ${v.voucher_no}?`)) return;
@@ -24,7 +26,7 @@ function MyVouchers() {
         <Link to="/employee/create" className="btn">+ New Voucher</Link>
       </div>
 
-      <VoucherFilters onSearch={setFilters} searchLabel="Voucher no / title" />
+      <VoucherFilters onSearch={setFilters} searchLabel="Voucher no / title" initial={initial} />
 
       {error && <div className="alert">{error}</div>}
       <p className="small">{loading ? "Loading..." : `${vouchers.length} voucher(s) found`}</p>

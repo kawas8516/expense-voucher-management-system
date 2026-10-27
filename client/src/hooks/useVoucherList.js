@@ -3,8 +3,9 @@ import api, { getErrorMsg } from "../api/axios";
 
 // loads /vouchers with filters + sorting, used by all list pages
 // baseParams = fixed params for the page, eg. { status: "pending" }
-export function useVoucherList(baseParams = {}, defaultSort = { sort: "created", order: "desc" }) {
-  const [filters, setFilters] = useState({});
+// initialFilters = starting filters, eg. { status: "approved" } from a menu link
+export function useVoucherList(baseParams = {}, defaultSort = { sort: "created", order: "desc" }, initialFilters = {}) {
+  const [filters, setFilters] = useState(initialFilters);
   const [sort, setSort] = useState(defaultSort);
   const [reloadCount, setReloadCount] = useState(0);
   const [result, setResult] = useState({ key: null, rows: [], error: "" });
