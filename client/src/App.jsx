@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import ToastProvider from "./components/ToastProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
@@ -33,9 +34,12 @@ function KeyBySearch({ children }) {
 function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <BrowserRouter>
+        {/* keyboard users can jump past the navbar */}
+        <a href="#main" className="skip-link">Skip to content</a>
         <Navbar />
-        <div className="container">
+        <main id="main" className="container" tabIndex={-1}>
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
@@ -63,8 +67,9 @@ function App() {
 
             <Route path="*" element={<h3>404 - Page not found</h3>} />
           </Routes>
-        </div>
+        </main>
       </BrowserRouter>
+      </ToastProvider>
     </AuthProvider>
   );
 }

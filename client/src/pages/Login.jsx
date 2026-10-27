@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api, { getErrorMsg } from "../api/axios";
+import Icon from "../components/Icon";
 
 // demo users from the seed script (same password for all)
 const DEMO_USERS = [
@@ -131,7 +132,12 @@ function Login() {
 
   return (
     <div className="login-box">
-      <h1 className="login-title">Expense Voucher Management System</h1>
+      <div className="login-head">
+        <h1 className="login-title">
+          <Icon name="wallet" size={26} /> Expense Voucher Management System
+        </h1>
+      </div>
+      <div className="login-body">
       <h2>Login</h2>
 
       {serverStatus === "waking" && (
@@ -197,6 +203,7 @@ function Login() {
             </button>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import api, { getErrorMsg } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/toast";
 import { formatDate } from "../utils/helpers";
 
 const ROLE_LABELS = { employee: "Employee", director: "Director", accounts: "Accounts Team" };
@@ -10,12 +12,21 @@ function Profile() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState("");
-  const [msg, setMsg] = useState("");
+  const toast = useToast();
   const [saving, setSaving] = useState(false);
+  const { hash } = useLocation();
+
+  // "Update Signature" in the profile menu opens /profile#signature -> go to that part
+  useEffect(() => {
+    if (hash !== "#signature") return;
+    const el = document.getElementById("signature");
+    if (el) el.scrollIntoView({ block: "start" });
+    const input = document.getElementById("new-signature");
+    if (input) input.focus();
+  }, [hash]);
 
   function handleFile(e) {
     const f = e.target.files[0];
-    setMsg("");
     if (!f) return;
     if (!["image/png", "image/jpeg"].includes(f.type)) {
       setError("Signature must be png / jpg");
@@ -44,7 +55,7 @@ function Profile() {
       refreshUser();
       setFile(null);
       setPreview(null);
-      setMsg("Signature saved. It will be used for your next voucher" + (user.role === "director" ? " approval." : "."));
+      toast("Signature saved. It will be used for your next " + (user.role === "director" ? "approval." : "voucher."));
     } catch (err) {
       setError(getErrorMsg(err));
     }
@@ -55,7 +66,6 @@ function Profile() {
     <div className="page">
       <h2>My Profile</h2>
 
-      {msg && <div className="success">{msg}</div>}
       {error && <div className="alert">{error}</div>}
 
       <table className="details">
@@ -71,7 +81,7 @@ function Profile() {
 
       {user.role !== "accounts" && (
         <>
-          <h3>My Signature</h3>
+          <h3 id="signature">My Signature</h3>
           <p className="small">
             {user.role === "director"
               ? "Used when you approve a voucher."

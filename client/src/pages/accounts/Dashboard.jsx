@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useDashboard } from "../../hooks/useDashboard";
 import StatCard from "../../components/StatCard";
+import { CategoryChart, WeeklyChart } from "../../components/Charts";
 import VoucherTable from "../../components/VoucherTable";
 import { formatAmount } from "../../utils/helpers";
 
@@ -25,6 +26,13 @@ function AccountsDashboard() {
         <StatCard label="Rejected" value={s.rejected} color="red" />
         <StatCard label="Total Approved Amount" value={formatAmount(s.approved_amount)} color="purple" />
       </div>
+
+      {data.charts && (
+        <div className="chart-grid">
+          <CategoryChart title="Approved amount by category" sub="Ready for reimbursement" data={data.charts.byCategory} />
+          <WeeklyChart title="Approved per week" sub="Last 8 weeks, by approval date" data={data.charts.byWeek} />
+        </div>
+      )}
 
       <h3>Recently Approved (ready for reimbursement)</h3>
       <VoucherTable vouchers={data.recent} />

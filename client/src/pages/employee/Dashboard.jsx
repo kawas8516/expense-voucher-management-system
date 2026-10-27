@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import Icon from "../../components/Icon";
 import { useAuth } from "../../context/AuthContext";
 import { useDashboard } from "../../hooks/useDashboard";
 import StatCard from "../../components/StatCard";
+import { CategoryChart, WeeklyChart } from "../../components/Charts";
 import VoucherTable from "../../components/VoucherTable";
 import { formatAmount } from "../../utils/helpers";
 
@@ -18,7 +20,7 @@ function EmployeeDashboard() {
     <div className="page">
       <div className="page-head">
         <h2>Welcome, {user.name}</h2>
-        <Link to="/employee/create" className="btn">+ New Voucher</Link>
+        <Link to="/employee/create" className="btn"><Icon name="plus" size={16} /> New Voucher</Link>
       </div>
 
       <div className="stat-grid">
@@ -29,6 +31,13 @@ function EmployeeDashboard() {
         <StatCard label="Rejected" value={s.rejected} color="red" />
         <StatCard label="Total Amount Claimed" value={formatAmount(s.total_claimed)} color="purple" />
       </div>
+
+      {data.charts && (
+        <div className="chart-grid">
+          <CategoryChart title="Amount by category" sub="Your submitted vouchers" data={data.charts.byCategory} />
+          <WeeklyChart title="Claims per week" sub="Last 8 weeks, by submit date" data={data.charts.byWeek} />
+        </div>
+      )}
 
       <h3>Recent Vouchers</h3>
       <VoucherTable vouchers={data.recent} showEmployee={false} />

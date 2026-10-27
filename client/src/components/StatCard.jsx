@@ -1,20 +1,26 @@
-// same colours as the status badges, dark enough to read on the light card
-const COLORS = {
-  blue: "#2471a3",
-  gray: "#646e70",
-  orange: "#a85400",
-  green: "#1e7b34",
-  red: "#c0392b",
-  purple: "#7d3c98",
+import Icon from "./Icon";
+
+// icon for each colour (colour = what the number is about)
+const ICONS = {
+  blue: "file",
+  gray: "pencil",
+  orange: "clock",
+  green: "check",
+  red: "x",
+  purple: "rupee",
 };
 
-// simple box for dashboard numbers
+// box for dashboard numbers. colours come from the theme (works in dark mode)
 function StatCard({ label, value, color = "blue" }) {
-  const c = COLORS[color] || COLORS.blue;
   return (
-    <div className="stat-card" style={{ borderTopColor: c }}>
-      <div className="stat-value" style={{ color: c }}>{value}</div>
-      <div className="stat-label">{label}</div>
+    <div className={"stat-card stat-" + color}>
+      <span className="stat-icon" aria-hidden="true">
+        <Icon name={ICONS[color] || "file"} />
+      </span>
+      <div>
+        <div className="stat-value">{value}</div>
+        <div className="stat-label">{label}</div>
+      </div>
     </div>
   );
 }

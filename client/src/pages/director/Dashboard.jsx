@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useDashboard } from "../../hooks/useDashboard";
 import StatCard from "../../components/StatCard";
+import { CategoryChart, WeeklyChart } from "../../components/Charts";
 import StatusBadge from "../../components/StatusBadge";
 import { AUDIT_LABELS, AUDIT_STATUS, formatAmount, formatDateTime } from "../../utils/helpers";
 
@@ -24,6 +25,13 @@ function DirectorDashboard() {
         <StatCard label="Rejected Today" value={s.rejected_today} color="red" />
         <StatCard label="Total Pending Amount" value={formatAmount(s.pending_amount)} color="purple" />
       </div>
+
+      {data.charts && (
+        <div className="chart-grid">
+          <CategoryChart title="Amount by category" sub="All submitted vouchers" data={data.charts.byCategory} />
+          <WeeklyChart title="Submitted per week" sub="Last 8 weeks, by submit date" data={data.charts.byWeek} />
+        </div>
+      )}
 
       {s.pending > 0 && (
         <p>

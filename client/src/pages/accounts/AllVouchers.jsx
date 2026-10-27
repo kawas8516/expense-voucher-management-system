@@ -4,6 +4,8 @@ import { useVoucherList } from "../../hooks/useVoucherList";
 import { useStatusParam } from "../../hooks/useStatusParam";
 import { STATUS_LABELS, formatAmount, today } from "../../utils/helpers";
 import { downloadCsv } from "../../utils/csv";
+import { useToast } from "../../context/toast";
+import Icon from "../../components/Icon";
 
 // columns of the exported file
 const CSV_COLUMNS = [
@@ -24,6 +26,7 @@ const CSV_COLUMNS = [
 
 function AccountsAllVouchers() {
   const initial = useStatusParam();
+  const toast = useToast();
   const { vouchers, error, loading, sort, toggleSort, setFilters } = useVoucherList({}, undefined, initial);
 
   // total of approved vouchers in the current list (for reimbursement)
@@ -47,9 +50,12 @@ function AccountsAllVouchers() {
           type="button"
           className="btn-sm btn-secondary"
           disabled={loading || vouchers.length === 0}
-          onClick={() => downloadCsv(`vouchers-${today()}.csv`, CSV_COLUMNS, vouchers)}
+          onClick={() => {
+            downloadCsv(`vouchers-${today()}.csv`, CSV_COLUMNS, vouchers);
+            toast(`Exported ${vouchers.length} voucher(s) to CSV`);
+          }}
         >
-          Export CSV
+          <Icon name="download" size={16} /> Export CSV
         </button>
       </div>
       <VoucherTable vouchers={vouchers} sort={sort} onSort={toggleSort} />

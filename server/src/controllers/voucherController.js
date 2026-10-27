@@ -252,6 +252,38 @@ export async function approveVoucher(req, res) {
   res.json(approved);
 }
 
+// POST /api/vouchers/bulk-approve  { ids: [..] }  (director)
+// approves all the given vouchers that are still pending, with the director's saved signature
+export async function bulkApprove(req, res) {
+  if (sendValidationErrors(req, res)) return;
+
+  const ids = [...new Set(req.body.ids.map(Number))];
+  const u = await pool.query("SELECT signature_path FROM users WHERE id = $1", [req.user.id]);
+  const signature = u.rows[0] ? u.rows[0].signature_path : null;
+  if (!signature) {
+    return res.status(400).json({ message: "Save your signature in My Profile before approving several vouchers" });
+  }
+
+  // one statement, so a voucher can't be approved twice even with two clicks
+  const result = await pool.query(
+    `UPDATE vouchers
+     SET status = 'approved', director_id = $1, director_signature = $2,
+         approved_at = NOW(), updated_at = NOW()
+     WHERE id = ANY($3::int[]) AND status = 'pending'
+     RETURNING id, voucher_no, amount`,
+    [req.user.id, signature, ids]
+  );
+
+  for (const v of result.rows) {
+    logAudit(req, "voucher_approved", { voucher: v, details: { amount: Number(v.amount), bulk: true } });
+  }
+  const done = new Set(result.rows.map((r) => r.id));
+  res.json({
+    approved: result.rows.map((r) => ({ id: r.id, voucher_no: r.voucher_no })),
+    skipped: ids.filter((id) => !done.has(id)), // not pending any more, or not found
+  });
+}
+
 // POST /api/vouchers/:id/reject  (director)
 export async function rejectVoucher(req, res) {
   if (sendValidationErrors(req, res)) return;

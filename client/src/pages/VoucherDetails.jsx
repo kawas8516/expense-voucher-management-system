@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import api, { getErrorMsg } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/toast";
 import StatusBadge from "../components/StatusBadge";
 import DirectorAction from "../components/DirectorAction";
 import VoucherHistory from "../components/VoucherHistory";
@@ -15,8 +16,18 @@ function VoucherDetails() {
 
   const [v, setV] = useState(null);
   const [error, setError] = useState("");
-  const [msg, setMsg] = useState(location.state ? location.state.msg : "");
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
+
+  // message from the page we came from (eg. "Voucher submitted for approval")
+  useEffect(() => {
+    const msg = location.state && location.state.msg;
+    if (msg) {
+      toast(msg, msg.startsWith("Saved as draft, but") ? "error" : "success");
+      navigate(location.pathname, { replace: true, state: null }); // don't show it again on refresh
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     api
@@ -32,7 +43,7 @@ function VoucherDetails() {
     try {
       const res = await api.post(`/vouchers/${id}/submit`);
       setV(res.data);
-      setMsg("Voucher submitted for approval");
+      toast("Voucher submitted for approval");
     } catch (err) {
       setError(getErrorMsg(err));
     }
@@ -43,6 +54,7 @@ function VoucherDetails() {
     if (!window.confirm(`Delete draft ${v.voucher_no}?`)) return;
     try {
       await api.delete(`/vouchers/${id}`);
+      toast(`Draft ${v.voucher_no} deleted`);
       navigate("/employee/vouchers");
     } catch (err) {
       setError(getErrorMsg(err));
@@ -62,7 +74,7 @@ function VoucherDetails() {
 
   function afterAction(updated, message) {
     setV(updated);
-    setMsg(message);
+    toast(message);
     setError("");
     window.scrollTo(0, 0);
   }
@@ -82,7 +94,6 @@ function VoucherDetails() {
         </span>
       </div>
 
-      {msg && <div className="success no-print">{msg}</div>}
       {error && <div className="alert">{error}</div>}
 
       {v.status === "rejected" && (

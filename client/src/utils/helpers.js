@@ -53,6 +53,14 @@ export function auditDetails(e) {
   return "-";
 }
 
+// short money for chart labels: 950 -> ₹950, 12340 -> ₹12.3k, 250000 -> ₹2.5L
+export function formatCompact(value) {
+  const n = Number(value || 0);
+  if (n >= 100000) return "₹" + (n / 100000).toFixed(1).replace(/\.0$/, "") + "L";
+  if (n >= 1000) return "₹" + (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  return "₹" + Math.round(n);
+}
+
 export function today() {
   const d = new Date();
   const m = String(d.getMonth() + 1).padStart(2, "0");

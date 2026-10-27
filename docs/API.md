@@ -32,6 +32,7 @@ Errors come back as `{ "message": "..." }`:
 | DELETE | `/vouchers/:id` | employee | - | own drafts only |
 | POST | `/vouchers/:id/submit` | employee | - | draft → pending, needs employee signature |
 | POST | `/vouchers/:id/approve` | director | multipart: `signature` (optional if one is saved) | pending → approved |
+| POST | `/vouchers/bulk-approve` | director | `{ ids: [1, 2, ...] }` (1-50) | approves the ones still pending with the director's saved signature → `{ approved, skipped }` |
 | POST | `/vouchers/:id/reject` | director | `{ reason }` | pending → rejected, reason 1-500 chars |
 | GET | `/vouchers/:id/history` | any | - | audit events from MongoDB, oldest first: `{ enabled, events }`. Same visibility as the voucher. `enabled: false` when MongoDB isn't connected |
 
@@ -56,7 +57,7 @@ GET /api/vouchers?department=sales&status=approved&min=500&sort=amount&order=asc
 
 ## Dashboard
 
-`GET /dashboard` returns `{ stats, recent }` for the logged-in role:
+`GET /dashboard` returns `{ stats, recent, charts }` for the logged-in role. `charts.byCategory` is the amount per category (biggest first), and `charts.byWeek` is the amount per week for the last 8 weeks (weeks start on Monday). Employees see their own submitted vouchers, the Director all submitted ones, and Accounts the approved ones.
 
 | Role | stats | recent |
 |---|---|---|

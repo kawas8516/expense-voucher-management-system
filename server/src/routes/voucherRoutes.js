@@ -9,6 +9,7 @@ import {
   deleteVoucher,
   submitVoucher,
   approveVoucher,
+  bulkApprove,
   rejectVoucher,
 } from "../controllers/voucherController.js";
 import { verifyToken, allowRoles } from "../middleware/auth.js";
@@ -84,6 +85,15 @@ router.delete("/:id", allowRoles("employee"), idRule, checkId, deleteVoucher);
 router.post("/:id/submit", allowRoles("employee"), idRule, checkId, submitVoucher);
 
 // director only
+router.post(
+  "/bulk-approve",
+  allowRoles("director"),
+  [
+    body("ids").isArray({ min: 1, max: 50 }).withMessage("Select between 1 and 50 vouchers"),
+    body("ids.*").isInt({ min: 1 }).withMessage("Invalid voucher id"),
+  ],
+  bulkApprove
+);
 router.post("/:id/approve", allowRoles("director"), upload.single("signature"), idRule, approveVoucher);
 router.post("/:id/reject", allowRoles("director"), idRule, rejectRules, rejectVoucher);
 

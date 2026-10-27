@@ -41,6 +41,7 @@ Suggested walkthrough: log in as an **Employee** to create and submit a voucher,
 - Signature upload for the employee (submit) and the Director (approve)
 - Director can approve or reject straight from the Pending list (**View / Approve / Reject** on each row)
 - Role dashboards, plus search, filter and sort on every list, and print
+- Dashboard charts (amount by category, amount per week), **bulk approve** for the Director, pop-up notifications, and a **dark mode** switch in the user menu
 - Navbar dropdown menus (Vouchers → Drafts / Pending / Approved / Rejected, and a user menu), a **My Profile** page to update the saved signature, an **Activity Log** page for the Director and Accounts, and **Export CSV** for Accounts
 - **Two databases**: PostgreSQL holds users and vouchers; MongoDB holds the audit log (every login and voucher action), shown as a **History** table on each voucher and as the Director's recent activity
 
